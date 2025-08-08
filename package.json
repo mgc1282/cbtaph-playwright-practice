@@ -19,5 +19,13 @@
   "devDependencies": {
     "@playwright/test": "^1.54.2",
     "@types/node": "^24.2.1"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "playwright": "^1.54.2",
+    "playwright-core": "^1.54.2",
+    "undici-types": "^7.10.0"
   }
 }
