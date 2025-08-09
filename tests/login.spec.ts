@@ -1,25 +1,34 @@
 import { test, expect } from '@playwright/test';
 
-test('Should able to login successfully', async ({ page }) => {
-    await page.goto('https://parabank.parasoft.com/parabank/index.htm');
-    await expect(page).toHaveURL('https://parabank.parasoft.com/parabank/index.htm');
+test('Should be able to login', async ({ page }) => {
+  await page.goto('https://www.saucedemo.com/');
+  await expect(page).toHaveURL('https://www.saucedemo.com/');
 
-    await page.locator('input[name="username"]').fill('test789');
-    await page.locator('input[name="password"]').fill('test');
-    await page.getByRole('button', { name: 'Log In' }).click();
-
-    await expect(page.getByRole('heading', { name: 'Accounts Overview' })).toBeVisible();
+  await page.locator('[data-test="username"]').fill('standard_user');
+  await page.locator('[data-test="password"]').fill('secret_sauce');
+  await page.locator('[data-test="login-button"]').click();
+  await page.getByText('Swag Labs').click();
+  await expect(page.getByText('Swag Labs')).toBeVisible();
+  await expect(page.locator('[data-test="primary-header"]')).toContainText('Swag Labs');
 });
 
 test('Should not be able to login with invalid credentials', async ({ page }) => {
-    await page.goto('https://parabank.parasoft.com/parabank/index.htm');
-    await expect(page).toHaveURL('https://parabank.parasoft.com/parabank/index.htm');
+  await page.goto('https://www.saucedemo.com/');
+  await expect(page).toHaveURL('https://www.saucedemo.com/');
 
-    await page.locator('input[name="username"]').fill('marianne123test'); // intentionally invalid username
-    await page.locator('input[name="password"]').fill('test'); 
-
-    await page.getByRole('button', { name: 'Log In' }).click();
-    await expect(page.getByText('An internal error has')).toBeVisible();
-    await expect(page.locator('#rightPanel')).toContainText('An internal error has occurred and has been logged.');
-    await page.screenshot({ path: 'screenshots/login-error.png' });
+  // Attempt to login with invalid credentials
+  await page.locator('[data-test="username"]').fill('standarduser'); //intentionally incorrect username
+  // await page.locator('[data-test="username"]').fill('standard_user'); //correct
+  await page.locator('[data-test="password"]').fill('secret_sauce');
+  await page.locator('[data-test="login-button"]').click();
+  await expect(page.locator('[data-test="error"]')).toBeVisible();
+  await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: Username and password do not match any user in this service');
+  await expect(page.locator('[data-test="login-container"]')).toMatchAriaSnapshot(`
+    - textbox "Username": standarduser
+    - textbox "Password": secret_sauce
+    - 'heading "Epic sadface: Username and password do not match any user in this service" [level=3]':
+      - button
+    - button "Login"
+    `);
+  await page.screenshot({ path: 'screenshot.png' });
 });
